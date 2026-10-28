@@ -1,0 +1,94 @@
+{
+  "generated": "2026-10-28T05:15:53.472Z",
+  "files": [
+    {
+      "path": "admin/app.js",
+      "bytes": 41085
+    },
+    {
+      "path": "admin/index.html",
+      "bytes": 6387
+    },
+    {
+      "path": "admin/style.css",
+      "bytes": 9114
+    },
+    {
+      "path": "index.html",
+      "bytes": 673
+    },
+    {
+      "path": "ll/图片/dt11.gif",
+      "bytes": 158115
+    },
+    {
+      "path": "ll/图片/dt3.gif",
+      "bytes": 15986
+    },
+    {
+      "path": "tr/d/app.js",
+      "bytes": 25447
+    },
+    {
+      "path": "tr/d/index.html",
+      "bytes": 5118
+    },
+    {
+      "path": "tr/d/jump.js",
+      "bytes": 4324
+    },
+    {
+      "path": "tr/d/keyword.js",
+      "bytes": 11569
+    },
+    {
+      "path": "tr/d/style.css",
+      "bytes": 18013
+    },
+    {
+      "path": "tr/d/软件库_files/01.png",
+      "bytes": 961
+    },
+    {
+      "path": "tr/d/软件库_files/02.png",
+      "bytes": 1645
+    },
+    {
+      "path": "tr/d/软件库_files/55.jpg",
+      "bytes": 128876
+    },
+    {
+      "path": "wp/aa/1.html",
+      "bytes": 4309
+    },
+    {
+      "path": "wp/bb/1.html",
+      "bytes": 4305
+    },
+    {
+      "path": "wp/bb/2.html",
+      "bytes": 4400
+    },
+    {
+      "path": "assets/01.png",
+      "bytes": 961
+    },
+    {
+      "path": "assets/02.png",
+      "bytes": 1645
+    },
+    {
+      "path": "assets/55.jpg",
+      "bytes": 128876
+    },
+    {
+      "path": "assets/dt11.gif",
+      "bytes": 158115
+    },
+    {
+      "path": "assets/dt3.gif",
+      "bytes": 15986
+    }
+  ],
+  "totalBytes": 745910
+}

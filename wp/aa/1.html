@@ -1,0 +1,134 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>正在跳转…</title><style>
+ /* 跳转页只做过渡，样式内联到单文件，避免多一次请求 */
+ html, body {
+ height: 100%;
+ margin: 0;
+ }
+ body {
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ background: #f7f7f7;
+ color: #444;
+ font: 14px/1.6 -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+ }
+ .tip {
+ text-align: center;
+ padding: 24px;
+ }
+ .spinner {
+ width: 28px;
+ height: 28px;
+ margin: 0 auto 14px;
+ border: 3px solid #ddd;
+ border-top-color: #4a6cf7;
+ border-radius: 50%;
+ animation: spin .8s linear infinite;
+ }
+ @keyframes spin { to { transform: rotate(360deg); } }
+ /* 兜底按钮平时隐藏，只有自动跳转失败才显示，避免用户以为页面卡死 */
+ .manual {
+ display: none;
+ margin-top: 16px;
+ }
+ .manual a {
+ display: inline-block;
+ padding: 10px 22px;
+ background: linear-gradient(45deg, #4a6cf7, #6c8dfa);
+ color: #fff;
+ border-radius: 50px;
+ text-decoration: none;
+ font-weight: 600;
+ }
+ .manual.is-show { display: block; }
+</style></head><body><div class="tip"><div class="spinner"></div><p id="tipText">正在跳转，请稍候…</p><div class="manual" id="manual"><a id="manualLink" href="#" rel="noopener">如果没有自动跳转，点这里</a></div></div><script>
+/* web/wp/aa/1.html — 口令跳转页（slot=aa）
+ * 行为对齐原站：本地数组随机挑一条 → myEeplace() 占位符替换 → location.href 跳转。
+ * 差别只有两点（契约 4 节要求）：
+ * 1. 优先 fetch('/api/links?site=trdy&slot=aa') 取服务端配置，服务端可随时换链接；
+ * 2. 不引 51.LA 等任何第三方统计。
+ * myEeplace 的替换规则照抄原站：{nnnn} 换成随机数字，{wwww} 换成随机字母。
+ */
+(function () {
+ 'use strict';
+
+ var SITE = 'trdy';
+ var SLOT = 'aa';
+
+ // 服务端不可达时的兜底链接，顺序即优先级（随机挑一条）
+ var FALLBACK_URLS = [
+ 'https://pan.xunlei.com/s/VP4wUUuIRgMnWFMUtVhAfVDFA1?pwd=cixa'
+ ];
+
+ // 原站 myEeplace 占位符替换，逻辑原样保留：
+ // 每命中一次 {nnnn} 就填一个随机数字，每命中一次 {wwww} 就填一个随机字母。
+ function myEeplace(str) {
+ var chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+ var out = String(str == null ? '' : str);
+ var i;
+ while (out.indexOf('{nnnn}') !== -1) {
+ out = out.replace('{nnnn}', String(Math.floor(Math.random() * 10)));
+ }
+ while (out.indexOf('{wwww}') !== -1) {
+ i = Math.floor(Math.random() * chars.length);
+ out = out.replace('{wwww}', chars.charAt(i));
+ }
+ return out;
+ }
+
+ function pick(list) {
+ if (!Array.isArray(list) || !list.length) return '';
+ return list[Math.floor(Math.random() * list.length)];
+ }
+
+ // 只放行 http(s)，防止配置里塞 javascript: 之类被当成跳转目标
+ function isSafeUrl(url) {
+ return /^https?:\/\//i.test(String(url || ''));
+ }
+
+ function go(url) {
+ var target = myEeplace(url);
+ if (!isSafeUrl(target)) return false;
+
+ var manual = document.getElementById('manual');
+ var manualLink = document.getElementById('manualLink');
+ if (manualLink) manualLink.setAttribute('href', target);
+ // 先给出手动入口：有些浏览器拦掉脚本跳转时，用户还能自己点
+ if (manual) manual.classList.add('is-show');
+
+ location.href = target;
+ return true;
+ }
+
+ function boot() {
+ var apiUrl = '/api/links?site=' + encodeURIComponent(SITE) + '&slot=' + encodeURIComponent(SLOT);
+
+ fetch(apiUrl, { credentials: 'same-origin', cache: 'no-store' })
+ .then(function (res) {
+ if (!res.ok) throw new Error('HTTP ' + res.status);
+ return res.json();
+ })
+ .then(function (data) {
+ if (data && typeof data.url === 'string' && data.url) {
+ go(data.url);
+ return;
+ }
+ throw new Error('no url');
+ })
+ .catch(function () {
+ // 服务端拿不到（未上传截图 403、接口挂了、断网）就回退本地数组
+ var url = pick(FALLBACK_URLS);
+ if (!go(url)) {
+ var tip = document.getElementById('tipText');
+ if (tip) tip.textContent = '暂时没有可用口令，请稍后重试';
+ }
+ });
+ }
+
+ if (document.readyState === 'loading') {
+ document.addEventListener('DOMContentLoaded', boot);
+ } else {
+ boot();
+ }
+})();
+</script></body></html>
